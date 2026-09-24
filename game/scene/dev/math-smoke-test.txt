@@ -1,5 +1,5 @@
 旁白:公式系统 Smoke Test。;
 旁白:行内公式：<math>V=IR</math>。;
-旁白:<math display>\\tau = F r \\sin\\theta</math>;
-旁白:<math display>E_k=\\frac{1}{2}mv^2</math>;
+旁白:<math display>\tau = F r \sin\theta</math>;
+旁白:<math display>E_k=\frac{1}{2}mv^2</math>;
 旁白:绝对值也不会被误判为换行：<math>|x|</math>。;
