@@ -81,6 +81,16 @@ jobs:
           test -f game/technical/generated/instrument/gpio-debug.json
           test -f game/technical/generated/protocol/i2c-whoami.json
 
+      - name: Build open VN registry
+        shell: bash
+        run: |
+          set -euxo pipefail
+          rm -rf game/vn/generated
+          node tools/build-vn-registry.mjs content/vn/registry.json game/vn/generated/registry.json
+          node tools/validate-vn-registry.mjs game/vn/generated/registry.json
+          node tools/patch-webgal-vn-system.mjs .webgal engine/vn-system
+          test -f game/vn/generated/registry.json
+
       - name: Build WebGAL
         shell: bash
         run: |
@@ -98,6 +108,7 @@ jobs:
           test -f packages/webgal/dist/game/technical/generated/circuit/esp32-led.json
           test -f packages/webgal/dist/game/technical/generated/instrument/gpio-debug.json
           test -f packages/webgal/dist/game/technical/generated/protocol/i2c-whoami.json
+          test -f packages/webgal/dist/game/vn/generated/registry.json
 
       - name: Fetch pinned WebGAL Android template
         shell: bash
