@@ -34,12 +34,12 @@ write(
     "import { gamePath } from './resourceBase';\n\n/**\n * 内置资源类型的枚举",
   );
   const mappings = [
-    ['\`./game/background/\${fileName}\`', 'gamePath(\`background/\${fileName}\`)'],
-    ['\`./game/scene/\${fileName}\`', 'gamePath(\`scene/\${fileName}\`)'],
-    ['\`./game/vocal/\${fileName}\`', 'gamePath(\`vocal/\${fileName}\`)'],
-    ['\`./game/figure/\${fileName}\`', 'gamePath(\`figure/\${fileName}\`)'],
-    ['\`./game/bgm/\${fileName}\`', 'gamePath(\`bgm/\${fileName}\`)'],
-    ['\`./game/video/\${fileName}\`', 'gamePath(\`video/\${fileName}\`)'],
+    ['`./game/background/${fileName}`', 'gamePath(`background/${fileName}`)'],
+    ['`./game/scene/${fileName}`', 'gamePath(`scene/${fileName}`)'],
+    ['`./game/vocal/${fileName}`', 'gamePath(`vocal/${fileName}`)'],
+    ['`./game/figure/${fileName}`', 'gamePath(`figure/${fileName}`)'],
+    ['`./game/bgm/${fileName}`', 'gamePath(`bgm/${fileName}`)'],
+    ['`./game/video/${fileName}`', 'gamePath(`video/${fileName}`)'],
   ];
   for (const [before, after] of mappings) {
     source = replaceOnce(source, before, after, 'assetSetter ' + before);
@@ -66,8 +66,8 @@ write(
   );
   source = replaceOnce(
     source,
-    'axios.get(\`./game/animation/\${animationName}.json\`)',
-    'axios.get(gamePath(\`animation/\${animationName}.json\`))',
+    'axios.get(`./game/animation/${animationName}.json`)',
+    'axios.get(gamePath(`animation/${animationName}.json`))',
     'animation item',
   );
   write(file, source);
@@ -90,14 +90,14 @@ write(
   );
   source = replaceOnce(
     source,
-    'return \`./game/template/\${normalized}\`;',
-    'return gamePath(\`template/\${normalized}\`);',
+    'return `./game/template/${normalized}`;',
+    'return gamePath(`template/${normalized}`);',
     'template asset',
   );
   source = replaceOnce(
     source,
-    'axios.get(\`game/template/\${templatePath.path}\`)',
-    'axios.get(gamePath(\`template/\${templatePath.path}\`))',
+    'axios.get(`game/template/${templatePath.path}`)',
+    'axios.get(gamePath(`template/${templatePath.path}`))',
     'template style',
   );
   write(file, source);
