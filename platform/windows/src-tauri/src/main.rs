@@ -13,6 +13,7 @@ use tauri::{
 
 const GAME_PROTOCOL_HOST: &str = "http://after-school-game.localhost/";
 const MAX_NON_RANGE_READ: u64 = 128 * 1024 * 1024;
+const MAX_RANGE_CHUNK: u64 = 16 * 1024 * 1024;
 
 fn main() {
     let game_data_root = game_data_root();
@@ -79,9 +80,16 @@ fn serve_game_data(root: &Path, request: Request<Vec<u8>>) -> Response<Vec<u8>> 
             .unwrap();
     }
 
-    let (start, end, status) = match range {
+    let (start, requested_end, status) = match range {
         Some((start, end)) => (start, end, StatusCode::PARTIAL_CONTENT),
         None => (0, file_size.saturating_sub(1), StatusCode::OK),
+    };
+    // Custom-protocol responses use an in-memory body. Clamp each ranged response
+    // so a client asking for a huge span cannot force a multi-GB allocation.
+    let end = if status == StatusCode::PARTIAL_CONTENT {
+        requested_end.min(start.saturating_add(MAX_RANGE_CHUNK - 1))
+    } else {
+        requested_end
     };
 
     let length = if file_size == 0 { 0 } else { end - start + 1 };
