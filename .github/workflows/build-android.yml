@@ -46,6 +46,8 @@ jobs:
         run: |
           set -euxo pipefail
           node tools/patch-webgal-math.mjs .webgal
+          node tools/patch-webgal-timed-choice.mjs .webgal engine/timed-choice
+          node tools/validate-timed-choice.mjs game/scene
 
           rm -rf .vendor game/vendor/katex
           mkdir -p .vendor/katex game/vendor/katex
