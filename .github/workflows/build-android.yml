@@ -46,6 +46,8 @@ jobs:
         run: |
           set -euxo pipefail
           node tools/patch-webgal-math.mjs .webgal
+          node tools/patch-webgal-timed-choice.mjs .webgal engine/timed-choice
+          node tools/validate-timed-choice.mjs game/scene
 
           rm -rf .vendor game/vendor/katex
           mkdir -p .vendor/katex game/vendor/katex
@@ -92,6 +94,7 @@ jobs:
           test -f packages/webgal/dist/index.html
           test -f packages/webgal/dist/game/vendor/katex/katex.min.js
           test -f packages/webgal/dist/game/vendor/katex/katex.min.css
+          grep -q "TIME LIMIT" packages/webgal/dist/index.js || true
           test -f packages/webgal/dist/game/technical/generated/code/blink.json
           test -f packages/webgal/dist/game/technical/generated/circuit/esp32-led.json
           test -f packages/webgal/dist/game/technical/generated/instrument/gpio-debug.json
