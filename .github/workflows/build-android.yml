@@ -3,7 +3,7 @@ name: Build Android APK
 on:
   push:
     branches:
-      - "**"
+      - main
   pull_request:
   workflow_dispatch:
 
@@ -45,7 +45,7 @@ jobs:
         run: |
           set -euxo pipefail
 
-          # Apply our deterministic WebGAL extension against the pinned upstream commit.
+          # Patch the pinned WebGAL source with deterministic, verified transforms.
           node tools/patch-webgal-math.mjs .webgal
 
           # Fetch an exact KaTeX release only at build time, then bundle all runtime

@@ -18,8 +18,8 @@
 - `characters/`：角色档案
 - `game/`：WebGAL 游戏内容和素材
 - `docs/math-authoring.md`：公式编写规范
-- `patches/`：针对固定 WebGAL 版本的作品级扩展
-- `tools/`：构建期内容检查
+- `tools/patch-webgal-math.mjs`：针对固定 WebGAL 版本的公式渲染扩展
+- `tools/validate-math.mjs`：构建期公式检查
 - `.github/workflows/build-android.yml`：Android APK 自动构建
 
 ## 公式
@@ -38,7 +38,7 @@
 
 剧情与设定先进入 `story/` 和 `characters/`，确认后同步落到 `game/scene/`。图片、立绘、CG、BGM 和语音分别放入 `game/` 对应素材目录。
 
-每次提交都会触发 Android Debug APK 构建。正式发行签名流程会在作品进入可发布阶段后单独加入，签名密钥不会写入仓库。
+PR 会构建 Android Debug APK；合并到 `main` 后再次构建主线 APK。正式发行签名流程会在作品进入可发布阶段后单独加入，签名密钥不会写入仓库。
 
 ## 上游
 

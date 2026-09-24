@@ -1,4 +1,4 @@
-Game_name:Project VN;
-Game_key:project-vn-2026;
+Game_name:放学后;
+Game_key:after-school-2026;
 Enable_Continue:true;
 Enable_flowchart:true;
