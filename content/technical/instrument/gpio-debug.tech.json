@@ -1,0 +1,37 @@
+{
+  "id": "instrument/gpio-debug",
+  "kind": "instrument",
+  "title": "GPIO18 调试",
+  "steps": [
+    {
+      "instrument": "multimeter",
+      "mode": "DC V",
+      "reading": "3.29",
+      "unit": "V",
+      "positiveProbe": "GPIO18",
+      "negativeProbe": "GND",
+      "caption": "万用表说明这里确实存在接近 3.3 V 的直流电平。"
+    },
+    {
+      "instrument": "oscilloscope",
+      "timebase": "1 ms/div",
+      "channels": [
+        {
+          "name": "CH1 GPIO18",
+          "unit": "V",
+          "samples": [0,0,3.3,3.3,3.3,0,0,0,3.3,3.3,3.3,0,0,0,3.3,3.3]
+        }
+      ],
+      "caption": "示波器把“3.3 V”展开到时间轴上：它其实在快速切换。"
+    },
+    {
+      "instrument": "logic-analyzer",
+      "timebase": "20 µs/div",
+      "channels": [
+        { "name": "GPIO18", "samples": [0,1,1,0,0,1,1,0,0,1,1,0] },
+        { "name": "ENABLE", "samples": [1,1,1,1,1,1,1,1,1,1,1,1] }
+      ],
+      "caption": "逻辑分析仪舍弃模拟幅值，只保留数字状态与时序关系。"
+    }
+  ]
+}
