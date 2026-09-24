@@ -71,12 +71,22 @@ function kindFor(relative) {
 const files = [];
 const hashGroups = new Map();
 
+function sha256File(file) {
+  return new Promise((resolve, reject) => {
+    const hash = crypto.createHash('sha256');
+    const stream = fs.createReadStream(file, { highWaterMark: 4 * 1024 * 1024 });
+    stream.on('data', (chunk) => hash.update(chunk));
+    stream.on('error', reject);
+    stream.on('end', () => resolve(hash.digest('hex')));
+  });
+}
+
 for (const full of walk(gameRoot).sort()) {
   const relative = path.relative(gameRoot, full).replaceAll('\\', '/');
   if (relative === generatedRelative || relative.endsWith('/.gitkeep') || relative === '.gitkeep') continue;
 
   const stat = fs.statSync(full);
-  const hash = crypto.createHash('sha256').update(fs.readFileSync(full)).digest('hex');
+  const hash = await sha256File(full);
   const pack = choosePack(relative);
   const item = {
     path: relative,
