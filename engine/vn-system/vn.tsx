@@ -13,6 +13,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import ReactDOM from 'react-dom';
 import { Provider, useSelector } from 'react-redux';
 import styles from './vn.module.scss';
+import { gamePath } from '@/Core/util/gameAssetsAccess/resourceBase';
 
 interface VnTarget {
   scene?: string;
@@ -114,7 +115,7 @@ function ChapterSelect({ group }: { group: string | null }) {
 
   useEffect(() => {
     let cancelled = false;
-    fetch('./game/vn/generated/registry.json')
+    fetch(gamePath('vn/generated/registry.json'))
       .then((response) => {
         if (!response.ok) throw new Error('HTTP ' + response.status);
         return response.json();
