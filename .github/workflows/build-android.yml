@@ -185,8 +185,6 @@ jobs:
 
           sed -i "s/applicationId \"com.openwebgal.demo\"/applicationId \"${APPLICATION_ID}\"/" .android/app/build.gradle
           sed -i "s#<string name=\"app_name\">WebGAL</string>#<string name=\"app_name\">${APP_NAME}</string>#" .android/app/src/main/res/values/strings.xml
-          sed -i 's#https://mirrors.aliyun.com/gradle/distributions/#https://services.gradle.org/distributions/#' \
-            .android/gradle/wrapper/gradle-wrapper.properties
 
       - name: Set up JDK 21
         uses: actions/setup-java@v4
