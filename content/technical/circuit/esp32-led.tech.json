@@ -1,0 +1,35 @@
+{
+  "id": "circuit/esp32-led",
+  "kind": "circuit",
+  "title": "GPIO 驱动 LED",
+  "width": 920,
+  "height": 420,
+  "components": [
+    { "id": "U1", "label": "ESP32", "value": "GPIO18", "x": 70, "y": 170, "w": 150, "h": 72 },
+    { "id": "R1", "label": "R1", "value": "330 Ω", "x": 315, "y": 170, "w": 120, "h": 72 },
+    { "id": "LED1", "label": "LED1", "value": "red LED", "x": 535, "y": 170, "w": 130, "h": 72 },
+    { "id": "GND", "label": "GND", "x": 765, "y": 170, "w": 90, "h": 72 }
+  ],
+  "wires": [
+    { "id": "W1", "net": "GPIO18", "points": [[220,206],[315,206]] },
+    { "id": "W2", "net": "LED_A", "points": [[435,206],[535,206]] },
+    { "id": "W3", "net": "GND", "points": [[665,206],[765,206]] }
+  ],
+  "steps": [
+    {
+      "focusComponents": ["U1"],
+      "focusNets": [],
+      "caption": "先从信号源开始：GPIO18 是这个电路唯一的主动控制端。"
+    },
+    {
+      "focusComponents": ["R1"],
+      "focusNets": ["GPIO18"],
+      "caption": "高电平沿 GPIO18 网络进入限流电阻。"
+    },
+    {
+      "focusComponents": ["LED1", "GND"],
+      "focusNets": ["LED_A", "GND"],
+      "caption": "电流经过 LED 后回到 GND，回路必须闭合。"
+    }
+  ]
+}
