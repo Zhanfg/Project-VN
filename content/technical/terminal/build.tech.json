@@ -1,0 +1,23 @@
+{
+  "id": "terminal/build",
+  "kind": "terminal",
+  "title": "构建与错误输出",
+  "steps": [
+    {
+      "caption": "命令本身和程序输出应该被清楚地区分。",
+      "lines": [
+        { "kind": "command", "text": "$ cmake --build build" },
+        { "kind": "stdout", "text": "[ 74%] Building CXX object motor.cpp.o" },
+        { "kind": "stdout", "text": "[100%] Linking CXX executable controller" }
+      ]
+    },
+    {
+      "caption": "错误不是一句“编译失败”，而是可定位的信息。",
+      "lines": [
+        { "kind": "command", "text": "$ cmake --build build" },
+        { "kind": "stderr", "text": "motor.cpp:42:17: error: use of undeclared identifier 'duty'" },
+        { "kind": "comment", "text": "exit code: 1" }
+      ]
+    }
+  ]
+}
