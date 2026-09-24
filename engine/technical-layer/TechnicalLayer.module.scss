@@ -1,0 +1,163 @@
+.layer {
+  position: absolute;
+  z-index: 11;
+  top: 5%;
+  bottom: 28%;
+  display: flex;
+  pointer-events: none;
+  box-sizing: border-box;
+  padding: 1.2rem;
+  font-family: system-ui, sans-serif;
+}
+
+.left { left: 2%; width: 48%; }
+.right { right: 2%; width: 48%; }
+.center { left: 15%; width: 70%; }
+.full { inset: 4% 4% 18% 4%; width: auto; }
+
+.panel {
+  width: 100%;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 14px;
+  background: rgba(13, 17, 23, 0.9);
+  box-shadow: 0 18px 48px rgba(0, 0, 0, 0.28);
+  backdrop-filter: blur(10px);
+  color: #e6edf3;
+}
+
+.title {
+  padding: 0.7rem 1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+  font-size: 0.9rem;
+  font-weight: 650;
+  letter-spacing: 0.02em;
+}
+
+.body { min-height: 0; flex: 1; overflow: auto; }
+
+.caption {
+  padding: 0.6rem 1rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  font-size: 0.82rem;
+  line-height: 1.45;
+  color: rgba(230, 237, 243, 0.82);
+}
+
+.loading,
+.error {
+  padding: 1rem;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.82rem;
+}
+
+.codeView { height: 100%; overflow: auto; }
+
+.codeView :global(.shiki) {
+  min-height: 100%;
+  box-sizing: border-box;
+  margin: 0;
+  padding: 1rem 0;
+  background: transparent !important;
+  font-size: 0.8rem;
+  line-height: 1.6;
+  tab-size: 2;
+}
+
+.codeView :global(.line) {
+  display: block;
+  min-height: 1.6em;
+  padding: 0 1rem 0 3.7rem;
+  position: relative;
+}
+
+.codeView :global(.line)::before {
+  content: attr(data-line);
+  position: absolute;
+  left: 0;
+  width: 2.9rem;
+  padding-right: 0.6rem;
+  box-sizing: border-box;
+  text-align: right;
+  color: rgba(230, 237, 243, 0.36);
+  user-select: none;
+}
+
+.codeView :global(.tech-line-focus) { background: rgba(255, 255, 255, 0.08); }
+
+.terminalView {
+  padding: 0.9rem 1rem;
+  white-space: pre-wrap;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.8rem;
+  line-height: 1.55;
+}
+
+.terminal_command { font-weight: 650; }
+.terminal_stdout { opacity: 0.88; }
+.terminal_stderr {
+  opacity: 1;
+  text-decoration: underline;
+  text-decoration-style: dotted;
+}
+.terminal_warning { opacity: 0.95; font-style: italic; }
+.terminal_comment { opacity: 0.58; }
+
+.algorithmView { padding: 1.1rem; }
+.algorithmItems {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+  align-items: stretch;
+}
+
+.algorithmItem,
+.algorithmItemActive {
+  min-width: 3.6rem;
+  padding: 0.75rem 0.8rem;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 10px;
+  text-align: center;
+  position: relative;
+}
+
+.algorithmItemActive {
+  border-width: 2px;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.algorithmIndex {
+  display: block;
+  margin-bottom: 0.2rem;
+  font-size: 0.64rem;
+  opacity: 0.45;
+}
+
+.algorithmLabels {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-top: 1rem;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.76rem;
+}
+
+.svgView {
+  width: 100%;
+  height: 100%;
+  min-height: 14rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.8rem;
+  box-sizing: border-box;
+}
+
+.svgView :global(svg) {
+  width: 100%;
+  height: 100%;
+  max-height: 100%;
+}

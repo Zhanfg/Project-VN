@@ -1,0 +1,22 @@
+{
+  "id": "code/blink",
+  "kind": "code",
+  "title": "第一次让 LED 闪起来",
+  "language": "cpp",
+  "theme": "github-dark",
+  "source": "content/technical/code/blink.cpp",
+  "steps": [
+    {
+      "focusLines": [3],
+      "caption": "先确定 LED 接在哪一个 GPIO。"
+    },
+    {
+      "focusLines": [6],
+      "caption": "GPIO 在输出前必须先配置方向。"
+    },
+    {
+      "focusLines": [10, 12],
+      "caption": "HIGH 与 LOW 让一个数字状态变成真实的电压变化。"
+    }
+  ]
+}
