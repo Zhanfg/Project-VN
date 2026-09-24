@@ -75,6 +75,9 @@ jobs:
           test -f game/technical/generated/algorithm/binary-search.json
           test -f game/technical/generated/plot/pwm.json
           test -f game/technical/generated/diagram/debug-loop.json
+          test -f game/technical/generated/circuit/esp32-led.json
+          test -f game/technical/generated/instrument/gpio-debug.json
+          test -f game/technical/generated/protocol/i2c-whoami.json
 
       - name: Build WebGAL
         shell: bash
@@ -90,6 +93,9 @@ jobs:
           test -f packages/webgal/dist/game/vendor/katex/katex.min.js
           test -f packages/webgal/dist/game/vendor/katex/katex.min.css
           test -f packages/webgal/dist/game/technical/generated/code/blink.json
+          test -f packages/webgal/dist/game/technical/generated/circuit/esp32-led.json
+          test -f packages/webgal/dist/game/technical/generated/instrument/gpio-debug.json
+          test -f packages/webgal/dist/game/technical/generated/protocol/i2c-whoami.json
 
       - name: Fetch pinned WebGAL Android template
         shell: bash
