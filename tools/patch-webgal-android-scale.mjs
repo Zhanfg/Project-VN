@@ -98,8 +98,8 @@ function replaceOnce(content, before, after, label) {
   let source = read(file);
   source = replaceOnce(
     source,
-    'https\\://mirrors.aliyun.com/gradle/distributions/',
-    'https\\://services.gradle.org/distributions/',
+    'distributionUrl=https\\://mirrors.aliyun.com/gradle/distributions/v8.11.1/gradle-8.11.1-bin.zip',
+    'distributionUrl=https\\://services.gradle.org/distributions/gradle-8.11.1-bin.zip',
     'official Gradle distribution',
   );
   write(file, source);
