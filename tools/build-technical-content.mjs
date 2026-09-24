@@ -121,6 +121,65 @@ function diagramSvg(nodes, edges, activeNodes = []) {
   ].join('');
 }
 
+function circuitSvg(config, step) {
+  const width = Number(config.width ?? 920);
+  const height = Number(config.height ?? 420);
+  const focusComponents = new Set(step.focusComponents ?? []);
+  const focusNets = new Set(step.focusNets ?? []);
+
+  const wiresSvg = (config.wires ?? []).map((wire) => {
+    if (!Array.isArray(wire.points) || wire.points.length < 2) {
+      throw new Error('Circuit wire requires at least two points: ' + JSON.stringify(wire));
+    }
+    const strong = focusNets.has(wire.net) || focusNets.has(wire.id);
+    const points = wire.points.map(([x, y]) => Number(x) + ',' + Number(y)).join(' ');
+    const middle = wire.points[Math.floor(wire.points.length / 2)];
+    const label = wire.label ?? wire.net ?? '';
+    return [
+      '<g data-net="' + safeXml(wire.net ?? wire.id ?? '') + '" opacity="' + (strong ? '1' : '.48') + '">',
+      '<polyline points="' + points + '" fill="none" stroke="currentColor" stroke-width="' + (strong ? '5' : '2.5') +
+        '" stroke-linejoin="round" stroke-linecap="round" />',
+      label
+        ? '<text x="' + Number(middle[0]) + '" y="' + (Number(middle[1]) - 8) +
+          '" text-anchor="middle" fill="currentColor" font-family="ui-monospace, monospace" font-size="13">' +
+          safeXml(label) + '</text>'
+        : '',
+      '</g>',
+    ].join('');
+  }).join('');
+
+  const componentsSvg = (config.components ?? []).map((component) => {
+    const strong = focusComponents.has(component.id);
+    const x = Number(component.x);
+    const y = Number(component.y);
+    const w = Number(component.w ?? 130);
+    const h = Number(component.h ?? 64);
+    return [
+      '<g data-component-id="' + safeXml(component.id) + '" opacity="' + (strong ? '1' : '.7') + '">',
+      '<rect x="' + x + '" y="' + y + '" width="' + w + '" height="' + h +
+        '" rx="10" fill="none" stroke="currentColor" stroke-width="' + (strong ? '4' : '2') + '" />',
+      '<text x="' + (x + w / 2) + '" y="' + (y + h / 2 - 3) +
+        '" text-anchor="middle" fill="currentColor" font-family="system-ui, sans-serif" font-size="17">' +
+        safeXml(component.label ?? component.id) + '</text>',
+      component.value
+        ? '<text x="' + (x + w / 2) + '" y="' + (y + h / 2 + 19) +
+          '" text-anchor="middle" fill="currentColor" opacity=".66" font-family="ui-monospace, monospace" font-size="12">' +
+          safeXml(component.value) + '</text>'
+        : '',
+      '</g>',
+    ].join('');
+  }).join('');
+
+  return [
+    '<svg viewBox="0 0 ' + width + ' ' + height + '" role="img" aria-label="circuit schematic">',
+    '<g fill="none">',
+    wiresSvg,
+    componentsSvg,
+    '</g>',
+    '</svg>',
+  ].join('');
+}
+
 function collect(dir, output = []) {
   for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
     const full = path.join(dir, entry.name);
@@ -157,6 +216,39 @@ for (const file of entries) {
   if (config.kind === 'terminal' || config.kind === 'algorithm') {
     if (!Array.isArray(config.steps) || config.steps.length === 0) throw new Error(file + ': steps are required');
     writePayload(config.id, { kind: config.kind, title: config.title ?? '', steps: config.steps });
+    continue;
+  }
+
+  if (config.kind === 'instrument') {
+    if (!Array.isArray(config.steps) || config.steps.length === 0) throw new Error(file + ': instrument steps are required');
+    const supported = new Set(['multimeter', 'oscilloscope', 'logic-analyzer']);
+    for (const step of config.steps) {
+      if (!supported.has(step.instrument)) throw new Error(file + ': unsupported instrument ' + step.instrument);
+    }
+    writePayload(config.id, { kind: 'instrument', title: config.title ?? '', steps: config.steps });
+    continue;
+  }
+
+  if (config.kind === 'protocol') {
+    if (!Array.isArray(config.steps) || config.steps.length === 0) throw new Error(file + ': protocol steps are required');
+    for (const step of config.steps) {
+      if (!Array.isArray(step.participants) || !Array.isArray(step.messages)) {
+        throw new Error(file + ': protocol step requires participants and messages');
+      }
+    }
+    writePayload(config.id, { kind: 'protocol', title: config.title ?? '', steps: config.steps });
+    continue;
+  }
+
+  if (config.kind === 'circuit') {
+    if (!Array.isArray(config.components) || !Array.isArray(config.wires)) {
+      throw new Error(file + ': circuit requires components and wires');
+    }
+    const steps = (config.steps?.length ? config.steps : [{}]).map((step) => ({
+      svg: circuitSvg(config, step),
+      caption: step.caption ?? '',
+    }));
+    writePayload(config.id, { kind: 'circuit', title: config.title ?? '', steps });
     continue;
   }
 
