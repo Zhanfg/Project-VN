@@ -4,7 +4,7 @@ import { stageStateManager } from '@/Core/Modules/stage/stageStateManager';
 import { ITechnicalViewState } from '@/Core/Modules/stage/stageInterface';
 import { getNumberArgByKey, getStringArgByKey } from '@/Core/util/getSentenceArg';
 
-const kinds = new Set<ITechnicalViewState['kind']>(['code', 'terminal', 'algorithm', 'plot', 'diagram']);
+const kinds = new Set<ITechnicalViewState['kind']>(['code', 'terminal', 'algorithm', 'plot', 'diagram', 'circuit', 'instrument', 'protocol']);
 const placements = new Set<ITechnicalViewState['placement']>(['left', 'right', 'center', 'full']);
 
 function initialTechnicalView(): ITechnicalViewState {
