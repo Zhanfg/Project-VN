@@ -11,7 +11,7 @@
 ## 独立公式
 
 ~~~text
-旁白:<math display>\\tau = F r \\sin\\theta</math>;
+旁白:<math display>\tau = F r \sin\theta</math>;
 ~~~
 
 公式标签内部的竖线不会被 WebGAL 当作换行分隔符，因此绝对值等写法可以直接使用：
