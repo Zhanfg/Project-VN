@@ -1,0 +1,12 @@
+[package]
+name = "after-school-windows"
+version = "0.1.0"
+description = "Windows shell for After School"
+edition = "2021"
+
+[build-dependencies]
+tauri-build = "=2.6.3"
+
+[dependencies]
+percent-encoding = "=2.3.2"
+tauri = { version = "=2.11.5" }

@@ -1,4 +1,4 @@
-name: Build Android APK
+name: Build Android + Windows
 
 on:
   push:
@@ -10,6 +10,10 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 env:
   WEBGAL_COMMIT: d0318e6c4cdb8b04bb5d891f40368cff3c6efc85
   WEBGAL_ANDROID_COMMIT: 07fb190d61d1aa496a6045a5e6c00506cb6954f5
@@ -19,13 +23,15 @@ env:
   APPLICATION_ID: io.github.zhanfg.afterschool
 
 jobs:
-  build-debug-apk:
+  build-web-runtime:
     runs-on: ubuntu-latest
     timeout-minutes: 30
 
     steps:
       - name: Checkout project
         uses: actions/checkout@v4
+        with:
+          lfs: true
 
       - name: Fetch pinned WebGAL 4.6.5
         shell: bash
@@ -41,10 +47,11 @@ jobs:
         with:
           node-version: "20"
 
-      - name: Prepare offline math runtime
+      - name: Patch relocatable runtime and prepare math
         shell: bash
         run: |
           set -euxo pipefail
+          node tools/patch-webgal-resource-base.mjs .webgal engine/resource-base
           node tools/patch-webgal-math.mjs .webgal
           node tools/patch-webgal-timed-choice.mjs .webgal engine/timed-choice
           node tools/validate-timed-choice.mjs game/scene
@@ -68,18 +75,12 @@ jobs:
           printf '{"private":true}\n' > .technical-build/package.json
           npm install --prefix .technical-build --no-save --ignore-scripts "shiki@${SHIKI_VERSION}"
 
-          node tools/build-technical-content.mjs             .technical-build/node_modules/shiki/dist/index.mjs             content/technical             game/technical/generated
+          node tools/build-technical-content.mjs \
+            .technical-build/node_modules/shiki/dist/index.mjs \
+            content/technical \
+            game/technical/generated
           node tools/validate-technical-content.mjs game/technical/generated
           node tools/patch-webgal-tech.mjs .webgal engine/technical-layer
-
-          test -f game/technical/generated/code/blink.json
-          test -f game/technical/generated/terminal/build.json
-          test -f game/technical/generated/algorithm/binary-search.json
-          test -f game/technical/generated/plot/pwm.json
-          test -f game/technical/generated/diagram/debug-loop.json
-          test -f game/technical/generated/circuit/esp32-led.json
-          test -f game/technical/generated/instrument/gpio-debug.json
-          test -f game/technical/generated/protocol/i2c-whoami.json
 
       - name: Build open VN registry
         shell: bash
@@ -89,26 +90,74 @@ jobs:
           node tools/build-vn-registry.mjs content/vn/registry.json game/vn/generated/registry.json
           node tools/validate-vn-registry.mjs game/vn/generated/registry.json
           node tools/patch-webgal-vn-system.mjs .webgal engine/vn-system
-          test -f game/vn/generated/registry.json
 
-      - name: Build WebGAL
+      - name: Audit and index runtime resources
         shell: bash
         run: |
           set -euxo pipefail
-          rm -rf .webgal/packages/webgal/public/game
+          rm -rf build/resource-report.json game/runtime/resource-index.json
+          node tools/build-resource-index.mjs \
+            game \
+            content/packs/packs.json \
+            build/resource-report.json \
+            game/runtime/resource-index.json
+          test -f build/resource-report.json
+          test -f game/runtime/resource-index.json
+
+      - name: Build WebGAL once
+        shell: bash
+        run: |
+          set -euxo pipefail
+          rm -rf .webgal/packages/webgal/public/game build/webgal-runtime
           cp -a game .webgal/packages/webgal/public/game
           npm install --global yarn@1.22.22
           cd .webgal
           yarn install --frozen-lockfile
           yarn build-ci
-          test -f packages/webgal/dist/index.html
-          test -f packages/webgal/dist/game/vendor/katex/katex.min.js
-          test -f packages/webgal/dist/game/vendor/katex/katex.min.css
-          test -f packages/webgal/dist/game/technical/generated/code/blink.json
-          test -f packages/webgal/dist/game/technical/generated/circuit/esp32-led.json
-          test -f packages/webgal/dist/game/technical/generated/instrument/gpio-debug.json
-          test -f packages/webgal/dist/game/technical/generated/protocol/i2c-whoami.json
-          test -f packages/webgal/dist/game/vn/generated/registry.json
+          cd ..
+
+          test -f .webgal/packages/webgal/dist/index.html
+          test -f .webgal/packages/webgal/dist/game/runtime/resource-index.json
+          test -f .webgal/packages/webgal/dist/game/vendor/katex/katex.min.js
+          test -f .webgal/packages/webgal/dist/game/technical/generated/code/blink.json
+          test -f .webgal/packages/webgal/dist/game/vn/generated/registry.json
+
+          mkdir -p build/webgal-runtime
+          cp -a .webgal/packages/webgal/dist/. build/webgal-runtime/
+
+      - name: Upload shared WebGAL runtime
+        uses: actions/upload-artifact@v4
+        with:
+          name: webgal-runtime
+          path: build/webgal-runtime
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 3
+
+      - name: Upload resource audit
+        uses: actions/upload-artifact@v4
+        with:
+          name: resource-audit
+          path: |
+            build/resource-report.json
+            game/runtime/resource-index.json
+          if-no-files-found: error
+          retention-days: 14
+
+  build-android-apk:
+    needs: build-web-runtime
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout project
+        uses: actions/checkout@v4
+
+      - name: Download shared WebGAL runtime
+        uses: actions/download-artifact@v4
+        with:
+          name: webgal-runtime
+          path: build/webgal-runtime
 
       - name: Fetch pinned WebGAL Android template
         shell: bash
@@ -119,18 +168,23 @@ jobs:
           git -C .android fetch --depth=1 origin "${WEBGAL_ANDROID_COMMIT}"
           git -C .android checkout --detach FETCH_HEAD
 
-      - name: Prepare Android project
+      - name: Install Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Prepare scalable Android project
         shell: bash
         run: |
           set -euxo pipefail
+          node tools/patch-webgal-android-scale.mjs .android
+
           rm -rf .android/app/src/main/assets/webgal
           mkdir -p .android/app/src/main/assets/webgal
-          cp -a .webgal/packages/webgal/dist/. .android/app/src/main/assets/webgal/
+          cp -a build/webgal-runtime/. .android/app/src/main/assets/webgal/
 
           sed -i "s/applicationId \"com.openwebgal.demo\"/applicationId \"${APPLICATION_ID}\"/" .android/app/build.gradle
           sed -i "s#<string name=\"app_name\">WebGAL</string>#<string name=\"app_name\">${APP_NAME}</string>#" .android/app/src/main/res/values/strings.xml
-
-          sed -i 's#https://mirrors.aliyun.com/gradle/distributions/#https://services.gradle.org/distributions/#'             .android/gradle/wrapper/gradle-wrapper.properties
 
       - name: Set up JDK 21
         uses: actions/setup-java@v4
@@ -157,4 +211,67 @@ jobs:
           name: AfterSchool-debug-apk
           path: AfterSchool-debug.apk
           if-no-files-found: error
+          compression-level: 0
+          retention-days: 14
+
+  build-windows-portable:
+    needs: build-web-runtime
+    runs-on: windows-latest
+    timeout-minutes: 35
+
+    steps:
+      - name: Checkout project
+        uses: actions/checkout@v4
+
+      - name: Download shared WebGAL runtime
+        uses: actions/download-artifact@v4
+        with:
+          name: webgal-runtime
+          path: build/webgal-runtime
+
+      - name: Install Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Split Windows shell and game data
+        shell: pwsh
+        run: |
+          node tools/prepare-windows-runtime.mjs build/webgal-runtime build/windows
+
+          Remove-Item platform/windows/shell-dist -Recurse -Force -ErrorAction SilentlyContinue
+          New-Item -ItemType Directory -Force platform/windows/shell-dist | Out-Null
+          Copy-Item build/windows/shell-dist/* platform/windows/shell-dist -Recurse -Force
+
+      - name: Set up Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Cache Rust build
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: platform/windows/src-tauri -> target
+
+      - name: Build Windows shell
+        shell: pwsh
+        run: |
+          cargo build --manifest-path platform/windows/src-tauri/Cargo.toml --release
+
+          $out = "build/AfterSchool-Windows"
+          Remove-Item $out -Recurse -Force -ErrorAction SilentlyContinue
+          New-Item -ItemType Directory -Force $out | Out-Null
+
+          Copy-Item platform/windows/src-tauri/target/release/after-school-windows.exe "$out/AfterSchool.exe"
+          Copy-Item build/windows/game-data "$out/game-data" -Recurse
+          Copy-Item build/windows/layout.json "$out/layout.json"
+
+          if (!(Test-Path "$out/AfterSchool.exe")) { throw "Windows executable missing" }
+          if (!(Test-Path "$out/game-data/config.txt")) { throw "Windows game-data config missing" }
+
+      - name: Upload Windows portable build
+        uses: actions/upload-artifact@v4
+        with:
+          name: AfterSchool-Windows-portable
+          path: build/AfterSchool-Windows
+          if-no-files-found: error
+          compression-level: 0
           retention-days: 14
