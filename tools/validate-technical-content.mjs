@@ -2,7 +2,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 
 const root = process.argv[2] ?? 'game/technical/generated';
-const allowedKinds = new Set(['code', 'terminal', 'algorithm', 'plot', 'diagram']);
+const allowedKinds = new Set(['code', 'terminal', 'algorithm', 'plot', 'diagram', 'circuit', 'instrument', 'protocol']);
 let count = 0;
 
 function walk(dir) {

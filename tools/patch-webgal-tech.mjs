@@ -61,7 +61,7 @@ copy('tech.ts', 'packages/webgal/src/Core/gameScripts/tech.ts');
   const technicalInterface = [
     'export interface ITechnicalViewState {',
     '  visible: boolean;',
-    "  kind: 'code' | 'terminal' | 'algorithm' | 'plot' | 'diagram';",
+    "  kind: 'code' | 'terminal' | 'algorithm' | 'plot' | 'diagram' | 'circuit' | 'instrument' | 'protocol';",
     '  src: string;',
     '  title: string;',
     "  placement: 'left' | 'right' | 'center' | 'full';",

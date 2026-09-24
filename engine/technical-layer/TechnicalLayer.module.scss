@@ -161,3 +161,178 @@
   height: 100%;
   max-height: 100%;
 }
+
+
+.instrumentMode,
+.scopeMeta {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.76rem;
+  opacity: 0.72;
+}
+
+.multimeter {
+  min-height: 15rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  padding: 1.4rem;
+  box-sizing: border-box;
+}
+
+.meterReading {
+  min-width: 14rem;
+  padding: 1rem 1.3rem;
+  border: 2px solid currentColor;
+  border-radius: 12px;
+  text-align: right;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+
+.meterReading span {
+  font-size: 2.4rem;
+  font-weight: 650;
+}
+
+.meterReading small {
+  margin-left: 0.5rem;
+  font-size: 1rem;
+  opacity: 0.74;
+}
+
+.probes {
+  display: flex;
+  gap: 1.4rem;
+  flex-wrap: wrap;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.78rem;
+}
+
+.scopeView,
+.logicView {
+  padding: 0.9rem 1rem;
+}
+
+.scopeSvg {
+  width: 100%;
+  min-height: 15rem;
+}
+
+.scopeGrid line {
+  stroke: currentColor;
+  stroke-width: 1;
+  opacity: 0.12;
+}
+
+.scopeTrace,
+.logicTrace {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.5;
+  vector-effect: non-scaling-stroke;
+}
+
+.channelLegend {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  font-size: 0.74rem;
+  opacity: 0.82;
+}
+
+.logicRow {
+  display: grid;
+  grid-template-columns: minmax(4rem, 7rem) 1fr;
+  gap: 0.75rem;
+  align-items: center;
+  margin: 0.45rem 0;
+}
+
+.logicRow svg {
+  width: 100%;
+  height: 3rem;
+}
+
+.logicName {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.74rem;
+}
+
+.protocolView {
+  padding: 1rem;
+}
+
+.protocolParticipants {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.6rem;
+  margin-bottom: 0.9rem;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.78rem;
+}
+
+.protocolParticipants span {
+  padding: 0.35rem 0.55rem;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 8px;
+}
+
+.protocolMessages {
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+}
+
+.protocolMessage,
+.protocolMessageActive {
+  display: grid;
+  grid-template-columns: minmax(11rem, 15rem) 1fr;
+  gap: 1rem;
+  align-items: start;
+  padding: 0.65rem 0.75rem;
+  border-left: 2px solid rgba(255, 255, 255, 0.18);
+}
+
+.protocolMessageActive {
+  border-left-width: 5px;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.protocolRoute {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  gap: 0.4rem;
+  align-items: center;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.74rem;
+}
+
+.protocolRoute strong:last-child {
+  text-align: right;
+}
+
+.protocolMessage small {
+  display: block;
+  margin-top: 0.2rem;
+  opacity: 0.62;
+}
+
+.protocolFields {
+  margin-top: 1rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+  padding-top: 0.8rem;
+}
+
+.protocolFields > div {
+  display: grid;
+  grid-template-columns: minmax(8rem, 0.4fr) 1fr;
+  gap: 0.7rem;
+  padding: 0.3rem 0;
+  font-size: 0.76rem;
+}
+
+.protocolFields code {
+  white-space: pre-wrap;
+  word-break: break-word;
+}
