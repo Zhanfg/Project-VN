@@ -22,6 +22,7 @@
 - `game/`：WebGAL 游戏内容和素材
 - `docs/math-authoring.md`：公式编写规范
 - `docs/technical-presentation.md`：技术内容编写规范
+- `docs/vn-feature-audit.md`：VN/Galgame 功能审计与作品级路线图
 - `tools/patch-webgal-math.mjs`：公式渲染扩展
 - `tools/patch-webgal-tech.mjs`：技术内容层扩展
 - `tools/build-technical-content.mjs`：构建技术演示资产
@@ -48,6 +49,14 @@
 `tech:show -kind=code -src=code/blink -placement=right -step=0;`
 
 随后可通过 `tech:step` 推进预先写好的演示步骤。技术画面状态与 WebGAL Stage State 一起存档和恢复。
+
+## 倒计时选择
+
+普通选择继续使用 WebGAL `choose`。需要压力的剧情可以写：
+
+`choose:立刻切断电源:safe|继续观察:wait -timeout=6 -timeoutChoose=1;`
+
+倒计时在菜单、回想和应用后台暂停；超时分支由作者明确指定。
 
 ## 开发方式
 
