@@ -30,7 +30,7 @@
 
 以及独立公式：
 
-`<math display>\\tau = F r \\sin\\theta</math>`
+`<math display>\tau = F r \sin\theta</math>`
 
 构建时会对所有场景公式做语法校验；KaTeX、CSS 和字体全部进入 APK，不使用 CDN。详细规则见 `docs/math-authoring.md`。
 
