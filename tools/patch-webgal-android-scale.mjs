@@ -39,7 +39,7 @@ function replaceOnce(content, before, after, label) {
     /**
      * Large-content overlay.
      *
-     * Runtime lookup order for /assets/webgal/game/*:
+     * Runtime lookup order for /assets/webgal/game/<logical-path>:
      *   1. filesDir/game-data/*
      *   2. APK assets via WebViewAssetLoader
      */
@@ -88,6 +88,19 @@ function replaceOnce(content, before, after, label) {
     "    aaptOptions {\n        noCompress['.keep_gz']\n    }",
     "    aaptOptions {\n        // Media is already compressed. Re-compressing it wastes build time and install-time CPU.\n        noCompress '.keep_gz', 'mp3', 'ogg', 'opus', 'wav', 'flac', 'mp4', 'webm', 'webp', 'avif', 'woff2'\n    }",
     'aapt noCompress media',
+  );
+  write(file, source);
+}
+
+
+{
+  const file = 'gradle/wrapper/gradle-wrapper.properties';
+  let source = read(file);
+  source = replaceOnce(
+    source,
+    'https\\://mirrors.aliyun.com/gradle/distributions/',
+    'https\\://services.gradle.org/distributions/',
+    'official Gradle distribution',
   );
   write(file, source);
 }
