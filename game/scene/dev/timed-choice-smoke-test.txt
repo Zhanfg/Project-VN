@@ -1,0 +1,10 @@
+旁白:Timed Choice Smoke Test。;
+旁白:电源轨突然开始掉压。;
+choose:立刻切断电源:timed_safe|继续观察一秒:timed_wait -timeout=5 -timeoutChoose=1;
+label:timed_safe;
+旁白:超时或主动选择第一项时会进入这里。;
+jumpLabel:timed_end;
+label:timed_wait;
+旁白:只有玩家在倒计时结束前主动选择第二项才会进入这里。;
+label:timed_end;
+旁白:Timed Choice Smoke Test 结束。;
