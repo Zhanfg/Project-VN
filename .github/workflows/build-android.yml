@@ -13,8 +13,9 @@ permissions:
 env:
   WEBGAL_COMMIT: d0318e6c4cdb8b04bb5d891f40368cff3c6efc85
   WEBGAL_ANDROID_COMMIT: 07fb190d61d1aa496a6045a5e6c00506cb6954f5
-  APP_NAME: Project VN
-  APPLICATION_ID: io.github.zhanfg.projectvn
+  KATEX_VERSION: 0.18.7
+  APP_NAME: 放学后
+  APPLICATION_ID: io.github.zhanfg.afterschool
 
 jobs:
   build-debug-apk:
@@ -39,6 +40,27 @@ jobs:
         with:
           node-version: "20"
 
+      - name: Prepare offline math runtime
+        shell: bash
+        run: |
+          set -euxo pipefail
+
+          # Apply our deterministic WebGAL extension against the pinned upstream commit.
+          git -C .webgal apply ../patches/webgal-math.patch
+
+          # Fetch an exact KaTeX release only at build time, then bundle all runtime
+          # JS/CSS/fonts into the game so the APK never depends on a CDN.
+          rm -rf .vendor game/vendor/katex
+          mkdir -p .vendor/katex game/vendor/katex
+          KATEX_TGZ="$(npm pack "katex@${KATEX_VERSION}" --pack-destination .vendor | tail -n 1)"
+          tar -xzf ".vendor/${KATEX_TGZ}" -C .vendor/katex --strip-components=1
+
+          cp .vendor/katex/dist/katex.min.js game/vendor/katex/
+          cp .vendor/katex/dist/katex.min.css game/vendor/katex/
+          cp -a .vendor/katex/dist/fonts game/vendor/katex/
+
+          node tools/validate-math.mjs .vendor/katex/dist/katex.mjs game/scene
+
       - name: Build WebGAL
         shell: bash
         run: |
@@ -50,6 +72,8 @@ jobs:
           yarn install --frozen-lockfile
           yarn build-ci
           test -f packages/webgal/dist/index.html
+          test -f packages/webgal/dist/game/vendor/katex/katex.min.js
+          test -f packages/webgal/dist/game/vendor/katex/katex.min.css
 
       - name: Fetch pinned WebGAL Android template
         shell: bash
@@ -68,7 +92,8 @@ jobs:
           mkdir -p .android/app/src/main/assets/webgal
           cp -a .webgal/packages/webgal/dist/. .android/app/src/main/assets/webgal/
 
-          sed -i "s/namespace 'com.openwebgal.demo'/namespace '${APPLICATION_ID}'/" .android/app/build.gradle
+          # Keep the Android template namespace aligned with its source packages.
+          # Only applicationId changes the install identity.
           sed -i "s/applicationId \"com.openwebgal.demo\"/applicationId \"${APPLICATION_ID}\"/" .android/app/build.gradle
           sed -i "s#<string name=\"app_name\">WebGAL</string>#<string name=\"app_name\">${APP_NAME}</string>#" .android/app/src/main/res/values/strings.xml
 
@@ -89,12 +114,12 @@ jobs:
           cd .android
           chmod +x gradlew
           ./gradlew --no-daemon assembleDebug
-          cp app/build/outputs/apk/debug/app-debug.apk ../Project-VN-debug.apk
+          cp app/build/outputs/apk/debug/app-debug.apk ../AfterSchool-debug.apk
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: Project-VN-debug-apk
-          path: Project-VN-debug.apk
+          name: AfterSchool-debug-apk
+          path: AfterSchool-debug.apk
           if-no-files-found: error
           retention-days: 14
