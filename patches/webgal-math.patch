@@ -1,0 +1,200 @@
+diff --git a/packages/webgal/index.html b/packages/webgal/index.html
+--- a/packages/webgal/index.html
++++ b/packages/webgal/index.html
+@@ -5,6 +5,8 @@
+     <link rel="icon" type="image/x-icon" href="/icons/favicon.ico" />
+     <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />
+     <link rel="manifest" href="/manifest.json" />
++    <link rel="stylesheet" href="./game/vendor/katex/katex.min.css" />
++    <script src="./game/vendor/katex/katex.min.js"></script>
+     <title>WebGAL</title>
+     <style>
+       html,
+diff --git a/packages/webgal/src/Stage/TextBox/TextBox.tsx b/packages/webgal/src/Stage/TextBox/TextBox.tsx
+--- a/packages/webgal/src/Stage/TextBox/TextBox.tsx
++++ b/packages/webgal/src/Stage/TextBox/TextBox.tsx
+@@ -18,6 +18,7 @@
+ export interface EnhancedNode {
+   reactNode: ReactNode;
+   enhancedValue?: { key: string; value: string }[];
++  isAtomic?: boolean;
+ }
+ 
+ export const TextBox = () => {
+@@ -129,8 +130,8 @@ export function compileSentence(
+   replace_space_with_nbsp = true,
+ ): EnhancedNode[][] {
+-  // 先拆行
+-  const lines = sentence.split(/(?<!\\)\|/).map((val: string) => useEscape(val));
++  // 先拆行，但公式内部的 | 必须保持为数学符号。
++  const lines = splitDialogLines(sentence);
+   // 对每一行进行注音处理
+   const rubyLines = lines.map((line) => parseString(line));
+   const nodeLines = rubyLines.map((line) => {
+@@ -140,10 +141,17 @@ export function compileSentence(
+       match(node.type)
+         .with(SegmentType.String, () => {
+-          const chars = splitChars(node.value as string, replace_space_with_nbsp);
++          const chars = splitChars(useEscape(node.value as string), replace_space_with_nbsp);
+           // eslint-disable-next-line max-nested-callbacks
+           ln.push(...chars.map((c) => ({ reactNode: c })));
+         })
++        .with(SegmentType.Math, () => {
++          const value = node.value as MathValue;
++          ln.push({
++            reactNode: renderMath(value.tex, value.displayMode),
++            isAtomic: true,
++          });
++        })
+         .endsWith(SegmentType.Link, () => {
+           const val = node.value as EnhancedValue;
+           // 检查是否是注音文本（通过检查是否有ruby值）
+@@ -253,6 +261,7 @@ export function splitChars(sentence: string, replace_space_with_nbsp = true) {
+ enum SegmentType {
+   String = 'SegmentType.String',
+   Link = 'SegmentType.Link',
++  Math = 'SegmentType.Math',
+ }
+ 
+ interface EnhancedValue {
+@@ -262,32 +271,104 @@ interface EnhancedValue {
+   values: { key: string; value: string }[];
+ }
+ 
++interface MathValue {
++  tex: string;
++  displayMode: boolean;
++}
++
+ interface Segment {
+   type: SegmentType;
+-  value?: string | EnhancedValue;
++  value?: string | EnhancedValue | MathValue;
+ }
+ 
+-function parseString(input: string): Segment[] {
++function renderMath(tex: string, displayMode: boolean): ReactNode {
++  const runtime = (window as any).katex;
++  const className = displayMode ? 'after-school-math after-school-math--display' : 'after-school-math';
++  if (!runtime?.renderToString) {
++    return <span className={className + ' after-school-math--fallback'}>{tex}</span>;
++  }
++  const html = runtime.renderToString(tex, {
++    displayMode,
++    throwOnError: false,
++    strict: false,
++    trust: false,
++    output: 'htmlAndMathml',
++  });
++  return <span className={className} dangerouslySetInnerHTML={{ __html: html }} />;
++}
++
++function splitDialogLines(input: string): string[] {
++  const result: string[] = [];
++  let buffer = '';
++  let inMath = false;
++
++  for (let i = 0; i < input.length; i += 1) {
++    if (input.startsWith('<math display>', i)) {
++      inMath = true;
++    } else if (input.startsWith('<math>', i)) {
++      inMath = true;
++    } else if (input.startsWith('</math>', i)) {
++      inMath = false;
++    }
++
++    const current = input[i];
++    const escaped = i > 0 && input[i - 1] === '\\';
++    if (current === '|' && !inMath && !escaped) {
++      result.push(buffer);
++      buffer = '';
++      continue;
++    }
++    buffer += current;
++  }
++  result.push(buffer);
++  return result;
++}
++
++function parseRichText(input: string): Segment[] {
+   const regex = /(\[([^\]]+)\]\(([^)]+)\))|([\s\S]+?(?=\[|$))/g;
+   const result: Segment[] = [];
+   let match: RegExpExecArray | null;
+ 
+   while ((match = regex.exec(input)) !== null) {
+     if (match[1]) {
+       // 链接部分
+-      const text = match[2];
+-      const enhance = match[3];
++      const text = useEscape(match[2]);
++      const enhance = useEscape(match[3]);
+       let parsedEnhanced: KeyValuePair[] = [];
+       let ruby = '';
+       if (enhance.match(/style=|tips=|ruby=|style-alltext=/)) {
+@@ -306,8 +387,34 @@ function parseString(input: string): Segment[] {
+     }
+   }
+ 
++  return result;
++}
++
++function parseString(input: string): Segment[] {
++  const result: Segment[] = [];
++  const mathRegex = /<math( display)?>([\s\S]*?)<\/math>/g;
++  let cursor = 0;
++  let mathMatch: RegExpExecArray | null;
++
++  while ((mathMatch = mathRegex.exec(input)) !== null) {
++    if (mathMatch.index > cursor) {
++      result.push(...parseRichText(input.slice(cursor, mathMatch.index)));
++    }
++    result.push({
++      type: SegmentType.Math,
++      value: {
++        tex: mathMatch[2].trim(),
++        displayMode: Boolean(mathMatch[1]),
++      },
++    });
++    cursor = mathRegex.lastIndex;
++  }
++
++  if (cursor < input.length) {
++    result.push(...parseRichText(input.slice(cursor)));
++  }
++
+   // 我也不知道为什么，不加这个就会导致在 Enhanced Value 处于行首时故障
+   // 你可以认为这个代码不明所以，但是不要删除
+   result.unshift({ type: SegmentType.String, value: '' });
+   return result;
+ }
+diff --git a/packages/webgal/src/Stage/TextBox/IMSSTextbox.tsx b/packages/webgal/src/Stage/TextBox/IMSSTextbox.tsx
+--- a/packages/webgal/src/Stage/TextBox/IMSSTextbox.tsx
++++ b/packages/webgal/src/Stage/TextBox/IMSSTextbox.tsx
+@@ -146,6 +146,25 @@ export default function IMSSTextbox(props: ITextboxProps) {
+       const duration =
+         textRevealEnd === undefined ? textDuration : Math.min(textDuration, Math.max(0, textRevealEnd - delay));
++      if (en.isAtomic) {
++        const className = isConcatPrefix
++          ? applyStyle('TextBox_textElement_Settled', styles.TextBox_textElement_Settled) + readTextClassName
++          : `${applyStyle(
++              'TextBox_textElement_start',
++              styles.TextBox_textElement_start,
++            )}${readTextClassName} Textelement_start`;
++        return (
++          <span
++            id={`${delay}`}
++            className={className}
++            key={currentDialogKey + 'atomic-' + index}
++            style={{
++              animationDelay: `${delay}ms`,
++              animationDuration: `${isConcatPrefix ? textDuration : duration}ms`,
++              position: 'relative',
++            }}
++          >
++            {e}
++          </span>
++        );
++      }
+       const styleClassName = ' ' + css(style);
+       const styleAllText = ' ' + css(style_alltext);
+       if (isConcatPrefix) {
