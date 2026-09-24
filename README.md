@@ -17,7 +17,7 @@
 
 - `story/`：世界观、剧情大纲、时间线、文风规则
 - `characters/`：角色档案
-- `content/technical/`：代码、终端、算法、图表、结构图等作者源文件
+- `content/technical/`：代码、终端、算法、图表、结构图、电路、仪器和协议等作者源文件
 - `engine/technical-layer/`：作品级 Technical Presentation Layer
 - `game/`：WebGAL 游戏内容和素材
 - `docs/math-authoring.md`：公式编写规范
@@ -41,7 +41,7 @@
 
 ## Technical Presentation Layer
 
-第一批支持 CodeView、TerminalView、AlgorithmView、PlotView 和 DiagramView。
+当前支持 CodeView、TerminalView、AlgorithmView、PlotView、DiagramView、CircuitView、InstrumentView 和 ProtocolView。
 
 例如：
 
