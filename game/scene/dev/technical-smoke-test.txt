@@ -1,0 +1,17 @@
+旁白:Technical Presentation Layer Smoke Test。;
+tech:show -kind=code -src=code/blink -placement=right -step=0;
+旁白:这是 CodeView 的第一步。;
+tech:step -step=2;
+旁白:现在只强调真正改变输出状态的两行。;
+tech:show -kind=terminal -src=terminal/build -placement=right -step=1;
+旁白:TerminalView 将命令、标准输出和错误分开呈现。;
+tech:show -kind=algorithm -src=algorithm/binary-search -placement=center -step=0;
+旁白:算法视图使用预先写好的 Trace。;
+tech:step -step=2;
+旁白:最后只剩一个候选位置。;
+tech:show -kind=plot -src=plot/pwm -placement=right -step=1;
+旁白:PlotView 用于波形、实验数据和函数关系。;
+tech:show -kind=diagram -src=diagram/debug-loop -placement=center -step=3;
+旁白:DiagramView 用来表现状态机、流程、架构和调试方法。;
+tech:hide;
+旁白:技术层关闭后继续普通视觉小说演出。;
