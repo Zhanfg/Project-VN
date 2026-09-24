@@ -46,7 +46,7 @@ jobs:
           set -euxo pipefail
 
           # Apply our deterministic WebGAL extension against the pinned upstream commit.
-          git -C .webgal apply ../patches/webgal-math.patch
+          node tools/patch-webgal-math.mjs .webgal
 
           # Fetch an exact KaTeX release only at build time, then bundle all runtime
           # JS/CSS/fonts into the game so the APK never depends on a CDN.
