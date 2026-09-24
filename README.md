@@ -18,11 +18,13 @@
 - `story/`：世界观、剧情大纲、时间线、文风规则
 - `characters/`：角色档案
 - `content/technical/`：代码、终端、算法、图表、结构图、电路、仪器和协议等作者源文件
+- `content/vn/registry.json`：开放式路线 / 分支 / 结局 / 章节注册表
 - `engine/technical-layer/`：作品级 Technical Presentation Layer
 - `game/`：WebGAL 游戏内容和素材
 - `docs/math-authoring.md`：公式编写规范
 - `docs/technical-presentation.md`：技术内容编写规范
 - `docs/vn-feature-audit.md`：VN/Galgame 功能审计与作品级路线图
+- `docs/vn-registry.md`：开放式 VN 元数据与章节选择规则
 - `tools/patch-webgal-math.mjs`：公式渲染扩展
 - `tools/patch-webgal-tech.mjs`：技术内容层扩展
 - `tools/build-technical-content.mjs`：构建技术演示资产
@@ -57,6 +59,18 @@
 `choose:立刻切断电源:safe|继续观察:wait -timeout=6 -timeoutChoose=1;`
 
 倒计时在菜单、回想和应用后台暂停；超时分支由作者明确指定。
+
+## 开放式 VN Registry
+
+当前路线、分支、结局和章节注册表可以保持为空，不要求现在就锁剧情。以后统一用：
+
+`vn:mark -kind=任意类别 -id=稳定ID;`
+
+记录全局进度。章节选择器通过：
+
+`vn:chapterSelect;`
+
+打开。章节尚未接 scene 时会显示为 `PLANNED`，不会阻止构建。
 
 ## 开发方式
 
