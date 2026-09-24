@@ -1,0 +1,33 @@
+/* 《放学后》作品级 WebGAL 样式。 */
+
+.after-school-math {
+  display: inline-block;
+  vertical-align: middle;
+  white-space: nowrap;
+  margin: 0 0.08em;
+  text-shadow: none;
+}
+
+.after-school-math--display {
+  display: inline-block;
+  width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  text-align: center;
+  margin: 0.18em 0;
+  padding: 0.08em 0;
+  font-size: 1.08em;
+}
+
+.after-school-math--fallback {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  opacity: 0.9;
+}
+
+.after-school-math .katex {
+  font-size: 1em;
+}
+
+.after-school-math--display .katex-display {
+  margin: 0;
+}
