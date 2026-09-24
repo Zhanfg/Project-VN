@@ -1,0 +1,3 @@
+旁白:Open VN Registry Smoke Test。;
+vn:mark -kind=custom -id=dev-smoke;
+旁白:通用 VN progress mark 已写入。;
