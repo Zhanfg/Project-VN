@@ -10,6 +10,10 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 env:
   WEBGAL_COMMIT: d0318e6c4cdb8b04bb5d891f40368cff3c6efc85
   WEBGAL_ANDROID_COMMIT: 07fb190d61d1aa496a6045a5e6c00506cb6954f5
@@ -26,6 +30,8 @@ jobs:
     steps:
       - name: Checkout project
         uses: actions/checkout@v4
+        with:
+          lfs: true
 
       - name: Fetch pinned WebGAL 4.6.5
         shell: bash
@@ -125,6 +131,7 @@ jobs:
           name: webgal-runtime
           path: build/webgal-runtime
           if-no-files-found: error
+          compression-level: 0
           retention-days: 3
 
       - name: Upload resource audit
@@ -206,6 +213,7 @@ jobs:
           name: AfterSchool-debug-apk
           path: AfterSchool-debug.apk
           if-no-files-found: error
+          compression-level: 0
           retention-days: 14
 
   build-windows-portable:
@@ -267,4 +275,5 @@ jobs:
           name: AfterSchool-Windows-portable
           path: build/AfterSchool-Windows
           if-no-files-found: error
+          compression-level: 0
           retention-days: 14
