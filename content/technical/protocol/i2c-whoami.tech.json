@@ -1,0 +1,45 @@
+{
+  "id": "protocol/i2c-whoami",
+  "kind": "protocol",
+  "title": "I²C 读取 WHO_AM_I",
+  "steps": [
+    {
+      "participants": ["ESP32", "I²C Bus", "IMU 0x68"],
+      "messages": [
+        { "from": "ESP32", "to": "IMU 0x68", "label": "START + 0x68 W", "detail": "选择从设备并进入写阶段", "active": true }
+      ],
+      "fields": [
+        { "name": "START", "value": "1" },
+        { "name": "Address", "value": "0x68" },
+        { "name": "R/W", "value": "0 (write)" }
+      ],
+      "caption": "第一次写不是为了传数据，而是为了告诉 IMU 接下来要访问哪个寄存器。"
+    },
+    {
+      "participants": ["ESP32", "I²C Bus", "IMU 0x68"],
+      "messages": [
+        { "from": "ESP32", "to": "IMU 0x68", "label": "WRITE 0x75", "detail": "WHO_AM_I 寄存器地址", "active": true },
+        { "from": "IMU 0x68", "to": "ESP32", "label": "ACK", "detail": "从设备确认收到地址" }
+      ],
+      "fields": [
+        { "name": "Register", "value": "0x75" },
+        { "name": "ACK", "value": "0" }
+      ],
+      "caption": "0x75 是寄存器地址，不是传感器返回值。"
+    },
+    {
+      "participants": ["ESP32", "I²C Bus", "IMU 0x68"],
+      "messages": [
+        { "from": "ESP32", "to": "IMU 0x68", "label": "RESTART + 0x68 R", "detail": "不释放总线，切换到读取阶段" },
+        { "from": "IMU 0x68", "to": "ESP32", "label": "DATA 0x71", "detail": "WHO_AM_I 返回值", "active": true },
+        { "from": "ESP32", "to": "IMU 0x68", "label": "NACK + STOP", "detail": "读取结束" }
+      ],
+      "fields": [
+        { "name": "R/W", "value": "1 (read)" },
+        { "name": "Data", "value": "0x71" },
+        { "name": "STOP", "value": "1" }
+      ],
+      "caption": "真正的数据在重新寻址为读之后才返回。"
+    }
+  ]
+}
