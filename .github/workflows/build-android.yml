@@ -14,6 +14,7 @@ env:
   WEBGAL_COMMIT: d0318e6c4cdb8b04bb5d891f40368cff3c6efc85
   WEBGAL_ANDROID_COMMIT: 07fb190d61d1aa496a6045a5e6c00506cb6954f5
   KATEX_VERSION: 0.18.7
+  SHIKI_VERSION: 4.4.3
   APP_NAME: 放学后
   APPLICATION_ID: io.github.zhanfg.afterschool
 
@@ -44,12 +45,8 @@ jobs:
         shell: bash
         run: |
           set -euxo pipefail
-
-          # Patch the pinned WebGAL source with deterministic, verified transforms.
           node tools/patch-webgal-math.mjs .webgal
 
-          # Fetch an exact KaTeX release only at build time, then bundle all runtime
-          # JS/CSS/fonts into the game so the APK never depends on a CDN.
           rm -rf .vendor game/vendor/katex
           mkdir -p .vendor/katex game/vendor/katex
           KATEX_TGZ="$(npm pack "katex@${KATEX_VERSION}" --pack-destination .vendor | tail -n 1)"
@@ -58,8 +55,26 @@ jobs:
           cp .vendor/katex/dist/katex.min.js game/vendor/katex/
           cp .vendor/katex/dist/katex.min.css game/vendor/katex/
           cp -a .vendor/katex/dist/fonts game/vendor/katex/
-
           node tools/validate-math.mjs .vendor/katex/dist/katex.mjs game/scene
+
+      - name: Build technical presentation assets
+        shell: bash
+        run: |
+          set -euxo pipefail
+          rm -rf .technical-build game/technical/generated
+          mkdir -p .technical-build
+          printf '{"private":true}\n' > .technical-build/package.json
+          npm install --prefix .technical-build --no-save --ignore-scripts "shiki@${SHIKI_VERSION}"
+
+          node tools/build-technical-content.mjs             .technical-build/node_modules/shiki/dist/index.mjs             content/technical             game/technical/generated
+          node tools/validate-technical-content.mjs game/technical/generated
+          node tools/patch-webgal-tech.mjs .webgal engine/technical-layer
+
+          test -f game/technical/generated/code/blink.json
+          test -f game/technical/generated/terminal/build.json
+          test -f game/technical/generated/algorithm/binary-search.json
+          test -f game/technical/generated/plot/pwm.json
+          test -f game/technical/generated/diagram/debug-loop.json
 
       - name: Build WebGAL
         shell: bash
@@ -74,6 +89,7 @@ jobs:
           test -f packages/webgal/dist/index.html
           test -f packages/webgal/dist/game/vendor/katex/katex.min.js
           test -f packages/webgal/dist/game/vendor/katex/katex.min.css
+          test -f packages/webgal/dist/game/technical/generated/code/blink.json
 
       - name: Fetch pinned WebGAL Android template
         shell: bash
@@ -92,10 +108,10 @@ jobs:
           mkdir -p .android/app/src/main/assets/webgal
           cp -a .webgal/packages/webgal/dist/. .android/app/src/main/assets/webgal/
 
-          # Keep the Android template namespace aligned with its source packages.
-          # Only applicationId changes the install identity.
           sed -i "s/applicationId \"com.openwebgal.demo\"/applicationId \"${APPLICATION_ID}\"/" .android/app/build.gradle
           sed -i "s#<string name=\"app_name\">WebGAL</string>#<string name=\"app_name\">${APP_NAME}</string>#" .android/app/src/main/res/values/strings.xml
+
+          sed -i 's#https://mirrors.aliyun.com/gradle/distributions/#https://services.gradle.org/distributions/#'             .android/gradle/wrapper/gradle-wrapper.properties
 
       - name: Set up JDK 21
         uses: actions/setup-java@v4
