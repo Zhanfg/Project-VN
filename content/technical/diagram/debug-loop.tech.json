@@ -1,0 +1,23 @@
+{
+  "id": "diagram/debug-loop",
+  "kind": "diagram",
+  "title": "调试闭环",
+  "nodes": [
+    { "id": "observe", "label": "观察现象", "x": 70, "y": 160, "w": 150, "h": 70 },
+    { "id": "hypothesis", "label": "提出假设", "x": 330, "y": 65, "w": 150, "h": 70 },
+    { "id": "experiment", "label": "设计实验", "x": 590, "y": 160, "w": 150, "h": 70 },
+    { "id": "evidence", "label": "读取证据", "x": 330, "y": 275, "w": 150, "h": 70 }
+  ],
+  "edges": [
+    { "from": "observe", "to": "hypothesis" },
+    { "from": "hypothesis", "to": "experiment" },
+    { "from": "experiment", "to": "evidence" },
+    { "from": "evidence", "to": "observe" }
+  ],
+  "steps": [
+    { "activeNodes": ["observe"], "caption": "先把“发生了什么”说清楚。" },
+    { "activeNodes": ["hypothesis"], "caption": "假设必须能够被实验区分。" },
+    { "activeNodes": ["experiment"], "caption": "每次实验尽可能只改变一个关键变量。" },
+    { "activeNodes": ["evidence"], "caption": "结果不支持假设时，回到现象重新建模。" }
+  ]
+}
