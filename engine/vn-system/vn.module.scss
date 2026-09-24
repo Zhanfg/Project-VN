@@ -1,0 +1,158 @@
+.overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 14;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4vh 5vw;
+  box-sizing: border-box;
+  background: rgba(0, 0, 0, 0.35);
+  backdrop-filter: blur(10px);
+}
+
+.panel {
+  width: min(1100px, 94vw);
+  max-height: 88vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border-radius: 18px;
+  background: rgba(248, 248, 248, 0.94);
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.32);
+  color: #252525;
+}
+
+.header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1.3rem 1.5rem 1rem;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.09);
+}
+
+.header h2 {
+  margin: 0.15rem 0 0;
+  font-size: 1.45rem;
+}
+
+.eyebrow {
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  opacity: 0.5;
+}
+
+.closeButton {
+  border: 0;
+  background: transparent;
+  font-size: 2rem;
+  line-height: 1;
+  cursor: pointer;
+  opacity: 0.58;
+}
+
+.content {
+  overflow: auto;
+  padding: 1.1rem 1.5rem 1.5rem;
+}
+
+.group + .group {
+  margin-top: 1.35rem;
+}
+
+.group h3 {
+  margin: 0 0 0.7rem;
+  font-size: 0.9rem;
+  opacity: 0.58;
+}
+
+.chapterGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: 0.7rem;
+}
+
+.chapterCard,
+.chapterCardDisabled {
+  min-height: 8.2rem;
+  padding: 0.9rem 1rem;
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.78);
+  text-align: left;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+}
+
+.chapterCard {
+  cursor: pointer;
+}
+
+.chapterCard:hover {
+  transform: translateY(-2px);
+  border-color: rgba(142, 53, 74, 0.48);
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.1);
+}
+
+.chapterCardDisabled {
+  cursor: default;
+  opacity: 0.56;
+}
+
+.chapterMeta {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: space-between;
+  margin-bottom: 0.55rem;
+  font-size: 0.62rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  opacity: 0.58;
+}
+
+.chapterCard strong,
+.chapterCardDisabled strong {
+  display: block;
+  font-size: 1rem;
+}
+
+.chapterCard small,
+.chapterCardDisabled small {
+  display: block;
+  margin-top: 0.25rem;
+  opacity: 0.62;
+}
+
+.chapterCard p,
+.chapterCardDisabled p {
+  margin: 0.65rem 0 0;
+  font-size: 0.78rem;
+  line-height: 1.55;
+  opacity: 0.72;
+}
+
+.empty {
+  min-height: 12rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.55rem;
+  text-align: center;
+  opacity: 0.62;
+}
+
+@media (max-width: 720px) {
+  .overlay {
+    padding: 2vh 3vw;
+  }
+
+  .panel {
+    max-height: 92vh;
+  }
+
+  .chapterGrid {
+    grid-template-columns: 1fr;
+  }
+}
