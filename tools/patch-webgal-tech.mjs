@@ -44,6 +44,18 @@ copy('tech.ts', 'packages/webgal/src/Core/gameScripts/tech.ts');
 }
 
 {
+  const file = 'packages/parser/src/interface/sceneInterface.ts';
+  let source = read(file);
+  source = replaceOnce(
+    source,
+    '  changeFigureDiff, // 切换等尺寸静态立绘差分；追加以保持旧指令编号\n}',
+    '  changeFigureDiff, // 切换等尺寸静态立绘差分；追加以保持旧指令编号\n  tech, // 《放学后》技术内容层；与引擎枚举保持同序\n}',
+    'parser commandType.tech',
+  );
+  write(file, source);
+}
+
+{
   const file = 'packages/webgal/src/Core/Modules/stage/stageInterface.ts';
   let source = read(file);
   const technicalInterface = [
