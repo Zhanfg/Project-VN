@@ -145,3 +145,6 @@ vite.config.ts.timestamp-*
 # 《放学后》 generated technical assets
 .technical-build/
 game/technical/generated/
+
+# 《放学后》 generated VN registry
+game/vn/generated/
