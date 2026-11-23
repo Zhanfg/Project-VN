@@ -40,7 +40,7 @@ function replaceOnce(content, before, after, label) {
      * Large-content overlay.
      *
      * Runtime lookup order for /assets/webgal/game/<logical-path>:
-     *   1. filesDir/game-data/*
+     *   1. filesDir/game-data/<logical-path>
      *   2. APK assets via WebViewAssetLoader
      */
     private fun externalGameDataResponse(request: WebResourceRequest): WebResourceResponse? {
