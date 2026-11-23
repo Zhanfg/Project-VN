@@ -202,8 +202,18 @@ jobs:
           set -euxo pipefail
           cd .android
           chmod +x gradlew
-          ./gradlew --no-daemon assembleDebug
+          ./gradlew --no-daemon testDebugUnitTest assembleDebug
           cp app/build/outputs/apk/debug/app-debug.apk ../AfterSchool-debug.apk
+
+      - name: Upload Android overlay unit test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: AfterSchool-Android-unit-tests
+          path: .android/app/build/test-results/testDebugUnitTest/*.xml
+          include-hidden-files: true
+          if-no-files-found: ignore
+          retention-days: 14
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
@@ -259,6 +269,8 @@ jobs:
             cargo generate-lockfile --manifest-path $manifest
             if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           }
+          cargo test --locked --manifest-path $manifest
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           cargo build --locked --manifest-path $manifest --release
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
