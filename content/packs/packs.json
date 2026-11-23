@@ -1,0 +1,56 @@
+{
+  "version": 1,
+  "budgets": {
+    "embeddedCoreBytes": 134217728,
+    "duplicateWarningBytes": 1048576
+  },
+  "packs": [
+    {
+      "id": "core",
+      "description": "Scenes, config, UI, generated metadata and other always-required runtime files.",
+      "include": [
+        "config.txt",
+        "scene/**",
+        "ui/**",
+        "template/**",
+        "technical/**",
+        "vn/**",
+        "runtime/**",
+        "userStyleSheet.css",
+        "flowchart.json"
+      ],
+      "delivery": {
+        "android": "embedded",
+        "windows": "external"
+      }
+    },
+    {
+      "id": "media",
+      "description": "Large audiovisual content. Kept independently addressable from the start.",
+      "include": [
+        "background/**",
+        "figure/**",
+        "bgm/**",
+        "vocal/**",
+        "video/**",
+        "animation/**"
+      ],
+      "delivery": {
+        "android": "embedded",
+        "windows": "external"
+      }
+    },
+    {
+      "id": "vendor",
+      "description": "Small engine-side third-party runtime files such as KaTeX.",
+      "include": [
+        "vendor/**"
+      ],
+      "delivery": {
+        "android": "embedded",
+        "windows": "shell"
+      }
+    }
+  ],
+  "fallbackPack": "core"
+}

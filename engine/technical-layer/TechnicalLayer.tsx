@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useStageState } from '@/hooks/useStageState';
 import styles from './TechnicalLayer.module.scss';
+import { gamePath } from '@/Core/util/gameAssetsAccess/resourceBase';
 
 type TechnicalKind =
   | 'code'
@@ -290,7 +291,7 @@ export function TechnicalLayer() {
       };
     }
 
-    const url = './game/technical/generated/' + tech.src.replace(/^\/+/, '') + '.json';
+    const url = gamePath('technical/generated/' + tech.src.replace(/^\/+/, '') + '.json');
     fetch(url)
       .then((response) => {
         if (!response.ok) throw new Error('HTTP ' + response.status);

@@ -148,3 +148,9 @@ game/technical/generated/
 
 # 《放学后》 generated VN registry
 game/vn/generated/
+
+# Cross-platform build outputs
+build/
+game/runtime/resource-index.json
+platform/windows/shell-dist/
+platform/windows/src-tauri/target/
