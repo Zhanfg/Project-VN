@@ -254,7 +254,13 @@ jobs:
       - name: Build Windows shell
         shell: pwsh
         run: |
-          cargo build --manifest-path platform/windows/src-tauri/Cargo.toml --release
+          $manifest = "platform/windows/src-tauri/Cargo.toml"
+          if (!(Test-Path "platform/windows/src-tauri/Cargo.lock")) {
+            cargo generate-lockfile --manifest-path $manifest
+            if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          }
+          cargo build --locked --manifest-path $manifest --release
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
           $out = "build/AfterSchool-Windows"
           Remove-Item $out -Recurse -Force -ErrorAction SilentlyContinue
@@ -266,6 +272,14 @@ jobs:
 
           if (!(Test-Path "$out/AfterSchool.exe")) { throw "Windows executable missing" }
           if (!(Test-Path "$out/game-data/config.txt")) { throw "Windows game-data config missing" }
+
+      - name: Upload resolved Windows Cargo lock
+        uses: actions/upload-artifact@v4
+        with:
+          name: AfterSchool-Windows-Cargo-lock
+          path: platform/windows/src-tauri/Cargo.lock
+          if-no-files-found: error
+          retention-days: 14
 
       - name: Upload Windows portable build
         uses: actions/upload-artifact@v4
